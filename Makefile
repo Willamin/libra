@@ -1,0 +1,6 @@
+.PHONY: build
+build:
+	middleman build
+	mkdir -p functions
+	go get ./...
+	go build -o functions/payment ./...

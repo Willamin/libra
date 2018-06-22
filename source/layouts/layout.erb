@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset="UTF-8">
+    <title><%= config[:site_name] %></title>
+    <link rel="stylesheet" href="https://cdn.wflewis.com/clean.css" />
+    <%= stylesheet_link_tag "site" %>
+    <%= javascript_include_tag "site" %>
+  </head>
+  <body>
+    <% if config[:demo] %><div class="corner-ribbon top-right sticky red">Demo Site</div><% end %>
+    <div class="content-container">
+      <div class="content">
+        <main>
+          <%= yield %>
+        </main>
+        <footer>
+          <span class="left">&copy; <%= DateTime.now.year %> <%= config[:copyright] %></span>
+          <span class="right">Made with <span class="hearts">&hearts;</span> & Powered by <a class="link" href="https://github.com/Willamin/libra">Libra</a></span>
+        </footer>
+      </div>
+    </div>
+  </body>
+</html>
