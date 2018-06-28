@@ -114,8 +114,12 @@ func redirectResponse(newLocation string) (events.APIGatewayProxyResponse, error
   }, nil
 }
 
-type App struct {
-
+func getEnv(keyname string) (string, error) {
+  key, found := os.LookupEnv(keyname)
+  if found == false {
+    return "", errors.New(fmt.Sprintf("%s not found", StripeApiKey))
+  }
+  return key, nil
 }
 
 func HandleRequest(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
@@ -126,12 +130,11 @@ func HandleRequest(request events.APIGatewayProxyRequest) (events.APIGatewayProx
   log.Printf("Params:")
   log.Printf("%v", request.Body)
 
-  key, found := os.LookupEnv(StripeApiKey)
-  stripe.Key = key
-  if found == false {
-    err = errors.New(fmt.Sprintf("%s not found", StripeApiKey))
+  key, err := getEnv(StripeApiKey)
+  if err != nil {
     return errorResponse(err)
   }
+  stripe.Key = key
 
   token, err := getTokenFromBody(request.Body)
   if err != nil {
