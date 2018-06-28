@@ -2,6 +2,7 @@ config[:site_name] = "Libra"
 config[:stripe_key_public] = "pk_test_Vo4mlNiNFZ9p265zqws5Xr0i"
 config[:copyright] = "Will Lewis"
 config[:demo] = true
+config[:lambda_url] = "/.netlify/functions/payment"
 
 configure :build do
   config[:host] = "https://libra-shop.org"
