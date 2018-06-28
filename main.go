@@ -150,6 +150,20 @@ func DoCli() {
   fmt.Printf("%v\n", allProducts())
 }
 
+func DemoItems() []Product {
+  return []Product{
+    Product{
+      Sku: "mug",
+      Cost: 500,
+      Name: "Mug",
+    },
+    Product{
+      Sku: "towel",
+      Cost: 1000,
+      Name: "Towel",
+    },
+  }
+}
 func main() {
   _, ok := os.LookupEnv(AWSLambdaFunctionVersion)
   if ok {
