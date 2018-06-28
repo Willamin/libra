@@ -48,13 +48,19 @@ func allProducts() []Product {
   return products
 }
 
-func getProductBySku(sku string) (Product, error) {
+func (a App) getProductBySku(sku string) Product {
+  defaultResponse := allProducts()[0]
+  if a.Err != nil {
+    return defaultResponse
+  }
+
   for _, v := range allProducts() {
     if v.Sku == sku {
-      return v, nil
+      return v
     }
   }
-  return allProducts()[0], errors.New(fmt.Sprintf("%s not found", sku))
+  a.Err = errors.New(fmt.Sprintf("%s not found", sku))
+  return defaultResponse
 }
 
 func errorResponse(err error) (events.APIGatewayProxyResponse, error) {
@@ -64,28 +70,24 @@ func errorResponse(err error) (events.APIGatewayProxyResponse, error) {
   }, err
 }
 
-func getTokenFromBody(body string) (string, error) {
+func (a App) getParamFromBody(body string, param string) string {
+  defaultResponse := ""
+  if a.Err != nil {
+    return defaultResponse
+  }
   q, err := url.ParseQuery(body)
-
-  token := q.Get("stripeToken")
-  return token, err
+  if err != nil {
+    a.Err = err
+  }
+  token := q.Get(param)
+  return token
 }
 
-func getSkuFromBody(body string) (string, error) {
-  q, err := url.ParseQuery(body)
+func (a App) buildCharge(product Product, token string) {
+  if a.Err != nil {
+    return
+  }
 
-  sku := q.Get("sku")
-  return sku, err
-}
-
-func getCallbackFromBody(body string) (string, error) {
-  q, err := url.ParseQuery(body)
-
-  cb := q.Get("callback")
-  return cb, err
-}
-
-func buildCharge(product Product, token string) (*stripe.Charge, error){
   chargeParams := &stripe.ChargeParams{
     Amount:      stripe.Int64(product.Cost),
     Currency:    stripe.String("usd"),
@@ -93,7 +95,10 @@ func buildCharge(product Product, token string) (*stripe.Charge, error){
   }
   chargeParams.SetSource(token)
 
-  return charge.New(chargeParams)
+  _, err := charge.New(chargeParams)
+  if err != nil {
+    a.Err = err
+  }
 }
 
 func simpleResponse() (events.APIGatewayProxyResponse, error) {
@@ -114,43 +119,54 @@ func redirectResponse(newLocation string) (events.APIGatewayProxyResponse, error
   }, nil
 }
 
-func getEnv(keyname string) (string, error) {
+func (a App) getEnv(keyname string) string {
+  defaultResponse := ""
+  if a.Err != nil {
+    return defaultResponse
+  }
+
   key, found := os.LookupEnv(keyname)
   if found == false {
-    return "", errors.New(fmt.Sprintf("%s not found", StripeApiKey))
+    a.Err = errors.New(fmt.Sprintf("%s not found", StripeApiKey))
+    return defaultResponse
   }
-  return key, nil
+  return key
 }
 
-func HandleRequest(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-  var err error = nil
-
+func logRequest(request events.APIGatewayProxyRequest) {
   log.Printf("Handling request:")
   log.Printf("%v", request)
   log.Printf("Params:")
   log.Printf("%v", request.Body)
+}
 
-  key, err := getEnv(StripeApiKey)
-  if err != nil {
-    return errorResponse(err)
+type App struct {
+  Err error
+}
+
+func appInit() App {
+  return App {
+    Err: nil,
   }
+}
+
+func HandleRequest(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+  app := appInit()
+
+  key := app.getEnv(StripeApiKey)
   stripe.Key = key
 
-  token, err := getTokenFromBody(request.Body)
-  if err != nil {
-    return errorResponse(err)
+  token := app.getParamFromBody(request.Body, "stripeToken")
+  sku := app.getParamFromBody(request.Body, "sku")
+  product := app.getProductBySku(sku)
+  app.buildCharge(product, token)
+
+  if app.Err != nil {
+    return errorResponse(app.Err)
   }
 
-  sku, err := getSkuFromBody(request.Body)
-  product, err := getProductBySku(sku)
-  if err != nil {
-    return errorResponse(err)
-  }
-
-  _, err = buildCharge(product, token)
-
-  callback, err := getCallbackFromBody(request.Body)
-  if err != nil {
+  callback := app.getParamFromBody(request.Body, "callback")
+  if app.Err != nil {
     return simpleResponse()
   }
 
