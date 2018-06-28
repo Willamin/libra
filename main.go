@@ -11,7 +11,9 @@ import (
   "github.com/stripe/stripe-go/product"
   "log"
   "net/url"
+  "net/http"
   "os"
+  "os/exec"
 )
 
 const (
@@ -164,6 +166,22 @@ func DemoItems() []Product {
     },
   }
 }
+
+func MockHandler() {
+  log.Printf("Building Middleman first...")
+
+  exec.Command("middleman", "build").Run()
+
+  http.HandleFunc("/.netlify/functions/payment", func (w http.ResponseWriter, r *http.Request) {
+    http.Redirect(w, r, "/thanks", 302)
+  })
+
+  http.Handle("/", http.FileServer(http.Dir("build")))
+
+  log.Printf("Listening at http://127.0.0.1:4000")
+  http.ListenAndServe(":4000", nil)
+}
+
 func main() {
   _, ok := os.LookupEnv(AWSLambdaFunctionVersion)
   if ok {
@@ -172,7 +190,8 @@ func main() {
     os.Exit(0)
   }
 
-  log.Printf("Not running in AWS lambda environment.")
-  DoCli()
+  log.Printf("Not running in AWS lambda environment, starting mock handler.")
+  // DoCli()
+  MockHandler()
   os.Exit(0)
 }
