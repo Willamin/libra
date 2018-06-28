@@ -85,6 +85,39 @@ func getCallbackFromBody(body string) (string, error) {
   return cb, err
 }
 
+func buildCharge(product Product, token string) (*stripe.Charge, error){
+  chargeParams := &stripe.ChargeParams{
+    Amount:      stripe.Int64(product.Cost),
+    Currency:    stripe.String("usd"),
+    Description: stripe.String(fmt.Sprintf("Charge for %s", product.Name)),
+  }
+  chargeParams.SetSource(token)
+
+  return charge.New(chargeParams)
+}
+
+func simpleResponse() (events.APIGatewayProxyResponse, error) {
+  return events.APIGatewayProxyResponse{
+    StatusCode: 200,
+    Body: "<h1>Thanks for your purchase</h1>",
+  }, nil
+}
+
+func redirectResponse(newLocation string) (events.APIGatewayProxyResponse, error) {
+  headers := map[string]string{
+    "Location": newLocation,
+  }
+
+  return events.APIGatewayProxyResponse{
+    StatusCode: 302,
+    Headers:    headers,
+  }, nil
+}
+
+type App struct {
+
+}
+
 func HandleRequest(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
   var err error = nil
 
@@ -111,34 +144,14 @@ func HandleRequest(request events.APIGatewayProxyRequest) (events.APIGatewayProx
     return errorResponse(err)
   }
 
-  chargeParams := &stripe.ChargeParams{
-    Amount:      stripe.Int64(product.Cost),
-    Currency:    stripe.String("usd"),
-    Description: stripe.String(fmt.Sprintf("Charge for %s", product.Name)),
-  }
-  chargeParams.SetSource(token)
-
-  _, err = charge.New(chargeParams)
-  if err != nil {
-    return errorResponse(err)
-  }
+  _, err = buildCharge(product, token)
 
   callback, err := getCallbackFromBody(request.Body)
   if err != nil {
-    return events.APIGatewayProxyResponse{
-      StatusCode: 200,
-      Body: "<h1>Thanks for your purchase</h1>",
-    }, nil
+    return simpleResponse()
   }
 
-  headers := map[string]string{
-    "Location": callback,
-  }
-
-  return events.APIGatewayProxyResponse{
-    StatusCode: 302,
-    Headers:    headers,
-  }, nil
+  return redirectResponse(callback)
 }
 
 func DoCli() {
