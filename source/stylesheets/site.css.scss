@@ -4,6 +4,8 @@ html {
 
 body {
   font-size: 20px;
+  // stripes-light by Aleksandar Velev found at https://www.toptal.com/designers/subtlepatterns/stripes-light/
+  background-image: url("/images/stripes-light.png");
 }
 
 .purchase {
@@ -47,13 +49,26 @@ body {
 
 .item {
   text-align: center;
-  border: 2px solid #444444;
+  background-color: #fefefe;
   padding: 1em;
   margin: 1em;
   width: 250px;
-  border-radius: 5px;
+  border-radius: 2px;
   display: flex;
   flex-direction: column;
+  // transform:
+  //   scale(0.95, 0.95);
+  box-shadow:
+    5px 5px 5px #44444444;
+  transition:
+    transform 0.4s,
+    box-shadow 0.4s;
+  &:hover {
+    transform:
+      scale(1.05, 1.05);
+    box-shadow:
+      5px 5px 10px #44444444;
+  }
 
   .image {
     height: auto;
@@ -88,6 +103,7 @@ a.link, a.link:visited {
 
 footer {
   font-size: 0.7em;
+  margin-top: 1em;
 }
 
 .hearts { color: #DD3F6A; }
@@ -100,19 +116,27 @@ footer {
   line-height: 2em;
   font-size: 1em;
   font-weight: 600;
-  border-radius: 5px;
-  border: 2px solid transparent;
+  border-radius: 2px;
   color: white;
-}
-.button:hover {
-  border: 2px solid #489B56;
-  background-color: transparent;
-  color: #489B56;
-  cursor: pointer;
-}
-.button:active {
-  transform:
-    translateY(2px);
-}
+  border: none;
 
+  box-shadow:
+    5px 5px 5px #44444444;
+  transition:
+    transform 0.4s,
+    box-shadow 0.4s;
+  &:hover {
+    transform:
+      scale(1.05, 1.05);
+    box-shadow:
+      5px 5px 10px #44444444;
+    // color: #489B56;
+    cursor: pointer;
+  }
+
+  &:active {
+    transform:
+      translateY(2px);
+  }
+}
 @import "ribbons.css.scss";

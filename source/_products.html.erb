@@ -1,25 +1,5 @@
 <div class="product-list">
   <% all_items.each do |item| %>
-  <div class="item">
-    <div class="info">
-      <span class="name"><%= item.name %></span>
-      <span class="price">$ <%= pricify(item.price) %></span>
-    </div>
-    <img class="image" src="<%= item.image %>"/>
-    <form action="<%= config[:lambda_url] %>" method="POST">
-      <input type="hidden" name="sku" value="<%= item.sku %>" />
-      <input type="hidden" name="callback" value="<%= config[:host] %>/thanks" />
-      <script
-        src="https://checkout.stripe.com/checkout.js" class="stripe-button"
-        data-key="<%= config[:stripe_key_public] %>"
-        data-amount="<%= item.price %>"
-        data-name="<%= config[:site_name] %>"
-        data-description="<%= item.name %>"
-        data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
-        data-locale="auto">
-      </script>
-      <input type="submit" class="button" value="Purchase" />
-    </form>
-  </div>
+    <%= partial(:item, :locals => { item: item }) %>
   <% end %>
 </div>

@@ -2,8 +2,6 @@
 
 _An e-commerce platform leveraging the power of static sites and FaaS_
 
-## Overview
-
 Libra is built using a few technologies/services:
 
 - Middleman generates the site
