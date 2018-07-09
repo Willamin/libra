@@ -3,7 +3,7 @@
     <span class="name"><%= item.name %></span>
     <span class="price">$ <%= pricify(item.price) %></span>
   </div>
-  <img class="image" src="<%= item.image %>"/>
+  <a target="_blank" href="<%= item.image %>"><img class="image" src="<%= item.image %>"/></a>
   <form action="<%= config[:lambda_url] %>" method="POST">
     <input type="hidden" name="sku" value="<%= item.sku %>" />
     <input type="hidden" name="callback" value="<%= config[:host] %>/thanks" />

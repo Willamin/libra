@@ -4,8 +4,6 @@ html {
 
 body {
   font-size: 20px;
-  // stripes-light by Aleksandar Velev found at https://www.toptal.com/designers/subtlepatterns/stripes-light/
-  background-image: url("/images/stripes-light.png");
 }
 
 .purchase {
@@ -60,20 +58,22 @@ body {
   //   scale(0.95, 0.95);
   box-shadow:
     5px 5px 5px #44444444;
-  transition:
-    transform 0.4s,
-    box-shadow 0.4s;
+  transition: 0.4s;
   &:hover {
-    transform:
-      scale(1.05, 1.05);
-    box-shadow:
-      5px 5px 10px #44444444;
+    transform: scale(1.05, 1.05);
+    box-shadow: 5px 5px 10px #44444444;
   }
 
   .image {
+    cursor: pointer;
     height: auto;
     width: calc(100% - 2em);
     margin: 1em;
+    transition: 0.4s;
+    &:hover {
+      transform: scale(1.025, 1.025);
+      box-shadow: 3px 3px 7px #44444444;
+    }
   }
 
   .name {
@@ -119,6 +119,7 @@ footer {
   border-radius: 2px;
   color: white;
   border: none;
+  -webkit-appearance: none;
 
   box-shadow:
     5px 5px 5px #44444444;
@@ -139,4 +140,11 @@ footer {
       translateY(2px);
   }
 }
+
+.dandelion {
+  background-image: url("/images/dandelion.jpg");
+  background-size: cover;
+  height: 600px;
+}
+
 @import "ribbons.css.scss";

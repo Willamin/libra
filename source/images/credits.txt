@@ -1,0 +1,2 @@
+stripes-light.png:
+  by Aleksandar Velev on https://www.toptal.com/designers/subtlepatterns/stripes-light/
